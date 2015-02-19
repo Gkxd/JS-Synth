@@ -14,8 +14,11 @@ function init() {
   catch(e) {
     alert('Web Audio API is not supported in this browser');
   }
-  var buffer = generateEnvelopeSound(makeEnvelope(0, 1, 5, 0.3, 0), sawtooth(620, zero()));
+  //var buffer = generateEnvelopeSound(makeEnvelope(1, 1, 5, 0.5, 5), sawtooth(440, sine(20, zero())));
   
+  //var buffer = generateEnvelopeSound(makeEnvelope(1, 1, 2, 0.5, 1), triangle(240, sine(20, zero())));
+  
+  var buffer = generateEnvelopeSound(makeEnvelope(1, 1, 2, 0.5, 1), square(760, triangle(20, (sine(0.5, zero())))));
   playSound(buffer);
 }
 
@@ -92,7 +95,7 @@ function triangle(frequency, modulo) {
   return waveform;
 }
 
-function square(frequency) {
+function square(frequency, modulo) {
   function waveform(i) {
     var temp = (frequency * 2 * i + modulo(i))% 2 - 1;
     
