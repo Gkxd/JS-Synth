@@ -14,7 +14,7 @@ function init() {
   catch(e) {
     alert('Web Audio API is not supported in this browser');
   }
-  var buffer = generateSound(2, sine(440, triangle(220, zero())));
+  var buffer = generateEnvelopeSound(makeEnvelope(0, 1, 5, 0.3, 0), sawtooth(620, zero()));
   
   playSound(buffer);
 }
@@ -47,6 +47,22 @@ function generateStereoSound(length, waveleft, waveright) {
   for (var i = 0; i < frameCount; i++) {
     buffer0[i] = waveleft(i/sampleRate);
     buffer1[i] = waveright(i/sampleRate);
+  }
+  
+  return soundBuffer;
+}
+
+function generateEnvelopeSound(envelope, waveform) {
+  var channels = 2;
+  var sampleRate = audioCtx.sampleRate;
+  var frameCount = sampleRate * (envelope.attack + envelope.decay + envelope.hold + envelope.release);
+  var soundBuffer = audioCtx.createBuffer(channels, frameCount, sampleRate);
+    
+  for (var channel = 0; channel < channels; channel++) {
+    var buffer = soundBuffer.getChannelData(channel);
+    for (var i = 0; i < frameCount; i++) {
+      buffer[i] = envelope(i/sampleRate)*waveform(i/sampleRate);
+    }
   }
   
   return soundBuffer;
@@ -101,6 +117,30 @@ function zero() {
   }
   
   return waveform;
+}
+
+function makeEnvelope(attack, decay, hold, sustain, release) {
+  function envelope(i) {
+    if (i < attack) {
+      return i/attack;
+    }
+    else if (i < attack + decay) {
+      return 1 - (1-sustain)*(i-attack)/decay;
+    }
+    else if (i < attack + decay + hold) {
+      return sustain;
+    }
+    else {
+      return sustain*(attack + decay + hold + release - i)/release;
+    }
+  }
+  
+  envelope["attack"] = attack;
+  envelope["decay"] = decay;
+  envelope["hold"] = hold;
+  envelope["release"] = release;
+  
+  return envelope;
 }
 
 function playSound(buffer) {
