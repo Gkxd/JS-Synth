@@ -24,4 +24,3 @@ This synthesizer provides 4 different waveform generator: `sine`, `sawtooth`, `t
 
 **`zero()`**:
 - Creates a waveform that returns 0
-- Used to terminate waveform nesting
